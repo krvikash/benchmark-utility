@@ -58,16 +58,23 @@ public class S3Client
 
     public NDV getNDV(String path)
     {
+        long totalFileCount = 0;
         long totalSize = 0;
         ListObjectsV2Request request = new ListObjectsV2Request()
                 .withBucketName(bucket)
                 .withPrefix(path);
         ListObjectsV2Result listObjects = client.listObjectsV2(request);
-        List<S3ObjectSummary> objectSummaries = listObjects.getObjectSummaries();
-        for (S3ObjectSummary objectSummary : objectSummaries) {
-            totalSize += objectSummary.getSize();
+        do {
+            List<S3ObjectSummary> objectSummaries = listObjects.getObjectSummaries();
+            for (S3ObjectSummary objectSummary : objectSummaries) {
+                totalSize += objectSummary.getSize();
+            }
+            totalFileCount += objectSummaries.size();
+            request.setContinuationToken(listObjects.getNextContinuationToken());
+            listObjects = client.listObjectsV2(request);
         }
-        return new NDV(getDataPath(bucket, path), objectSummaries.size(), totalSize);
+        while (listObjects.isTruncated());
+        return new NDV(getDataPath(bucket, path), totalFileCount, totalSize);
     }
 
     public static class Builder

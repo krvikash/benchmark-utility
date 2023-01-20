@@ -12,8 +12,10 @@
  * limitations under the License.
  */
 package io.krvikash.iceberg.benchmark;
+
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 import static io.krvikash.iceberg.benchmark.Format.Case.LOWER;
 import static java.lang.String.format;
@@ -21,6 +23,7 @@ import static java.lang.String.format;
 public abstract class Benchmark
 {
     protected String prefix;
+    protected Optional<FileSize> fileSize;
     protected int scaleFactor;
     protected String name;
     protected Format format;
@@ -33,12 +36,20 @@ public abstract class Benchmark
     {
         return format(
                 "%s-%s-sf%s-%s%s",
-                this.prefix,
-                this.name,
-                this.scaleFactor,
+                getPrefixWithFileSizeIfNeeded(),
+                name,
+                scaleFactor,
                 formatCase == LOWER
                         ? format.toString().toLowerCase(Locale.ENGLISH)
                         : format.toString().toUpperCase(Locale.ENGLISH),
                 isPartitioned ? "-part" : "");
+    }
+
+    private String getPrefixWithFileSizeIfNeeded()
+    {
+        if (fileSize.isEmpty()) {
+            return prefix;
+        }
+        return prefix + "-" + fileSize.get() + "-files";
     }
 }
