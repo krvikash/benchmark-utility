@@ -15,7 +15,9 @@ package io.krvikash.iceberg.benchmark;
 
 import io.krvikash.iceberg.benchmark.statistics.StatisticsDriver;
 
-import static io.krvikash.iceberg.benchmark.Format.Case.LOWER;
+import java.util.Optional;
+
+import static io.krvikash.iceberg.benchmark.Format.Case.UPPER;
 import static io.krvikash.iceberg.benchmark.Format.ORC;
 import static io.krvikash.iceberg.benchmark.Format.PARQUET;
 
@@ -25,8 +27,11 @@ public class Main
     {
         String bucket = "benchmarks-data"; // change here if needed
         String schemaPrefix = "iceberg"; // change here if needed
+        Optional<FileSize> fileSize = Optional.of(FileSize.of(1, FileSize.Unit.MB)); // change here if needed
+        // Use this when size is not needed
+        // Optional<FileSize> fileSize = Optional.empty();
         int scaleFactor = 1000; // change here if needed
-        Format.Case formatCase = LOWER; // change here if needed
+        Format.Case formatCase = UPPER; // change here if needed
 
         S3Client s3Client = new S3Client.Builder()
                 .withBucket(bucket)
@@ -35,15 +40,15 @@ public class Main
         StatisticsDriver statisticsDriver = new StatisticsDriver(s3Client);
 
         // TPC-H files
-        statisticsDriver.printTpchStatistics(schemaPrefix, scaleFactor, PARQUET, formatCase, false);
-        statisticsDriver.printTpchStatistics(schemaPrefix, scaleFactor, PARQUET, formatCase, true);
-        statisticsDriver.printTpchStatistics(schemaPrefix, scaleFactor, ORC, formatCase, false);
-        statisticsDriver.printTpchStatistics(schemaPrefix, scaleFactor, ORC, formatCase, true);
+        statisticsDriver.printTpchStatistics(schemaPrefix, fileSize, scaleFactor, PARQUET, formatCase, false);
+        statisticsDriver.printTpchStatistics(schemaPrefix, fileSize, scaleFactor, PARQUET, formatCase, true);
+        statisticsDriver.printTpchStatistics(schemaPrefix, fileSize, scaleFactor, ORC, formatCase, false);
+        statisticsDriver.printTpchStatistics(schemaPrefix, fileSize, scaleFactor, ORC, formatCase, true);
 
         // TPC-DS files
-        statisticsDriver.printTpcdsStatistics(schemaPrefix, scaleFactor, PARQUET, formatCase, false);
-        statisticsDriver.printTpcdsStatistics(schemaPrefix, scaleFactor, PARQUET, formatCase, true);
-        statisticsDriver.printTpcdsStatistics(schemaPrefix, scaleFactor, ORC, formatCase, false);
-        statisticsDriver.printTpcdsStatistics(schemaPrefix, scaleFactor, ORC, formatCase, true);
+        statisticsDriver.printTpcdsStatistics(schemaPrefix, fileSize, scaleFactor, PARQUET, formatCase, false);
+        statisticsDriver.printTpcdsStatistics(schemaPrefix, fileSize, scaleFactor, PARQUET, formatCase, true);
+        statisticsDriver.printTpcdsStatistics(schemaPrefix, fileSize, scaleFactor, ORC, formatCase, false);
+        statisticsDriver.printTpcdsStatistics(schemaPrefix, fileSize, scaleFactor, ORC, formatCase, true);
     }
 }

@@ -14,12 +14,15 @@
 package io.krvikash.iceberg.benchmark.statistics;
 
 import io.krvikash.iceberg.benchmark.Benchmark;
+import io.krvikash.iceberg.benchmark.FileSize;
 import io.krvikash.iceberg.benchmark.Format;
 import io.krvikash.iceberg.benchmark.S3Client;
 import io.krvikash.iceberg.benchmark.tpcds.TpcdsBenchmark;
 import io.krvikash.iceberg.benchmark.tpcds.TpcdsStatistics;
 import io.krvikash.iceberg.benchmark.tpch.TpchBenchmark;
 import io.krvikash.iceberg.benchmark.tpch.TpchStatistics;
+
+import java.util.Optional;
 
 public class StatisticsDriver
 {
@@ -30,16 +33,16 @@ public class StatisticsDriver
         this.s3Client = s3Client;
     }
 
-    public void printTpchStatistics(String schemaPrefix, int scaleFactor, Format format, Format.Case formatCase, boolean isPartitioned)
+    public void printTpchStatistics(String schemaPrefix, Optional<FileSize> fileSize, int scaleFactor, Format format, Format.Case formatCase, boolean isPartitioned)
     {
-        Benchmark benchmark = new TpchBenchmark(schemaPrefix, scaleFactor, format, formatCase, isPartitioned);
+        Benchmark benchmark = new TpchBenchmark(schemaPrefix, fileSize, scaleFactor, format, formatCase, isPartitioned);
         Statistics statistics = new TpchStatistics(s3Client, benchmark);
         statistics.printNDV(statistics.getNDV());
     }
 
-    public void printTpcdsStatistics(String schemaPrefix, int scaleFactor, Format format, Format.Case formatCase, boolean isPartitioned)
+    public void printTpcdsStatistics(String schemaPrefix, Optional<FileSize> fileSize, int scaleFactor, Format format, Format.Case formatCase, boolean isPartitioned)
     {
-        Benchmark benchmark = new TpcdsBenchmark(schemaPrefix, scaleFactor, format, formatCase, isPartitioned);
+        Benchmark benchmark = new TpcdsBenchmark(schemaPrefix, fileSize, scaleFactor, format, formatCase, isPartitioned);
         Statistics statistics = new TpcdsStatistics(s3Client, benchmark);
         statistics.printNDV(statistics.getNDV());
     }

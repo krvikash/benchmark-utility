@@ -14,19 +14,22 @@
 package io.krvikash.iceberg.benchmark.tpch;
 
 import io.krvikash.iceberg.benchmark.Benchmark;
+import io.krvikash.iceberg.benchmark.FileSize;
 import io.krvikash.iceberg.benchmark.Format;
 import io.trino.tpch.TpchTable;
 
 import java.util.List;
+import java.util.Optional;
 
 public class TpchBenchmark
         extends Benchmark
 {
-    public TpchBenchmark(String prefix, int scaleFactor, Format format, Format.Case formatCase, boolean isPartitioned)
+    public TpchBenchmark(String prefix, Optional<FileSize> fileSize, int scaleFactor, Format format, Format.Case formatCase, boolean isPartitioned)
     {
         this.prefix = prefix;
         this.name = "tpch";
         this.format = format;
+        this.fileSize = fileSize;
         this.scaleFactor = scaleFactor;
         this.formatCase = formatCase;
         this.isPartitioned = isPartitioned;

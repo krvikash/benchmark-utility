@@ -14,20 +14,23 @@
 package io.krvikash.iceberg.benchmark.tpcds;
 
 import io.krvikash.iceberg.benchmark.Benchmark;
+import io.krvikash.iceberg.benchmark.FileSize;
 import io.krvikash.iceberg.benchmark.Format;
 import io.trino.tpcds.Table;
 
 import java.util.List;
+import java.util.Optional;
 
 public class TpcdsBenchmark
         extends Benchmark
 {
-    public TpcdsBenchmark(String prefix, int scaleFactor, Format format, Format.Case lowercaseFormat, boolean isPartitioned)
+    public TpcdsBenchmark(String prefix, Optional<FileSize> fileSize, int scaleFactor, Format format, Format.Case lowercaseFormat, boolean isPartitioned)
     {
         this.prefix = prefix;
         this.name = "tpcds";
         this.format = format;
         this.scaleFactor = scaleFactor;
+        this.fileSize = fileSize;
         this.formatCase = lowercaseFormat;
         this.isPartitioned = isPartitioned;
     }
