@@ -19,10 +19,13 @@ import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.ListObjectsV2Request;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
+import com.amazonaws.services.s3.model.ObjectListing;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
+import com.google.common.collect.ImmutableList;
 import io.krvikash.iceberg.benchmark.statistics.NDV;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static io.krvikash.iceberg.benchmark.BenchmarkUtils.getDataPath;
 
@@ -59,22 +62,29 @@ public class S3Client
     public NDV getNDV(String path)
     {
         long totalFileCount = 0;
-        long totalSize = 0;
+        AtomicLong totalSize = new AtomicLong();
         ListObjectsV2Request request = new ListObjectsV2Request()
                 .withBucketName(bucket)
                 .withPrefix(path);
         ListObjectsV2Result listObjects = client.listObjectsV2(request);
         do {
-            List<S3ObjectSummary> objectSummaries = listObjects.getObjectSummaries();
-            for (S3ObjectSummary objectSummary : objectSummaries) {
-                totalSize += objectSummary.getSize();
+            listObjects.getObjectSummaries().forEach(objectSummary -> totalSize.addAndGet(objectSummary.getSize()));
+            totalFileCount += listObjects.getObjectSummaries().size();
+            if (!listObjects.isTruncated()) {
+                listObjects = null;
+                break;
             }
-            totalFileCount += objectSummaries.size();
             request.setContinuationToken(listObjects.getNextContinuationToken());
             listObjects = client.listObjectsV2(request);
         }
         while (listObjects.isTruncated());
-        return new NDV(getDataPath(bucket, path), totalFileCount, totalSize);
+
+        // last batch of listObjects
+        if (listObjects != null) {
+            listObjects.getObjectSummaries().forEach(objectSummary -> totalSize.addAndGet(objectSummary.getSize()));
+            totalFileCount += listObjects.getObjectSummaries().size();
+        }
+        return new NDV(getDataPath(bucket, path), totalFileCount, totalSize.get());
     }
 
     public static class Builder
