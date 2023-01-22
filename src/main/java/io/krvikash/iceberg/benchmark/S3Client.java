@@ -66,24 +66,17 @@ public class S3Client
         ListObjectsV2Request request = new ListObjectsV2Request()
                 .withBucketName(bucket)
                 .withPrefix(path);
-        ListObjectsV2Result listObjects = client.listObjectsV2(request);
+        ListObjectsV2Result listObjects;
         do {
+            listObjects = client.listObjectsV2(request);
+
             listObjects.getObjectSummaries().forEach(objectSummary -> totalSize.addAndGet(objectSummary.getSize()));
             totalFileCount += listObjects.getObjectSummaries().size();
-            if (!listObjects.isTruncated()) {
-                listObjects = null;
-                break;
-            }
+
             request.setContinuationToken(listObjects.getNextContinuationToken());
-            listObjects = client.listObjectsV2(request);
         }
         while (listObjects.isTruncated());
 
-        // last batch of listObjects
-        if (listObjects != null) {
-            listObjects.getObjectSummaries().forEach(objectSummary -> totalSize.addAndGet(objectSummary.getSize()));
-            totalFileCount += listObjects.getObjectSummaries().size();
-        }
         return new NDV(getDataPath(bucket, path), totalFileCount, totalSize.get());
     }
 
