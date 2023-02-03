@@ -37,6 +37,11 @@ public class BenchmarkUtils
         return format("s3://%s/%s", bucket, dataPathPrefix);
     }
 
+    public static String getTableLocation(String bucket, String schemaName, String tableName)
+    {
+        return format("s3://%s/%s/%s", bucket, schemaName, tableName);
+    }
+
     public static String getDataPathPrefix(String schemaName, String tableName)
     {
         return format("%s/%s/data", schemaName, tableName);

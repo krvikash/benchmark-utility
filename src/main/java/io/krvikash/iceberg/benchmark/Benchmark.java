@@ -32,6 +32,14 @@ public abstract class Benchmark
 
     public abstract List<String> getTableNames();
 
+    public String targetMaxFileSize()
+    {
+        if (fileSize.isPresent()) {
+            return fileSize.get().toString();
+        }
+        return "1GB";
+    }
+
     public String schemaName()
     {
         return format(
@@ -50,6 +58,8 @@ public abstract class Benchmark
         if (fileSize.isEmpty()) {
             return prefix;
         }
+        // Use it, if you want file size to be included in prefix
         return prefix + "-" + fileSize.get() + "-files";
+        //return prefix + "-" + "small" + "-files";
     }
 }

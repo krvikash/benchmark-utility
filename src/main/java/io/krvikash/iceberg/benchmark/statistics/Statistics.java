@@ -20,6 +20,7 @@ import io.krvikash.iceberg.benchmark.S3Client;
 import java.util.List;
 
 import static io.krvikash.iceberg.benchmark.BenchmarkUtils.getDataPathPrefix;
+import static io.krvikash.iceberg.benchmark.BenchmarkUtils.getTableLocation;
 import static io.krvikash.iceberg.benchmark.BenchmarkUtils.humanReadableByteCountSI;
 import static java.lang.String.format;
 
@@ -33,7 +34,10 @@ public abstract class Statistics
         ImmutableList.Builder counter = new ImmutableList.Builder();
         for (String tableName : benchmark.getTableNames()) {
             String path = getDataPathPrefix(benchmark.schemaName(), tableName);
-            counter.add(s3Client.getNDV(path));
+            NDV ndv = s3Client.getNDV(path);
+            counter.add(ndv);
+            // To print incrementally
+            // System.out.println(ndv);
         }
         return counter.build();
     }
@@ -41,7 +45,10 @@ public abstract class Statistics
     public void printNDV(List<NDV> ndvList)
     {
         long totalSize = 0;
-        System.out.println(format("============== NDV: [%s] ==============", benchmark.schemaName()));
+        System.out.println(format(
+                "============== NDV: [%s] ============== iceberg.target_max_file_size = '%s'; ==============",
+                benchmark.schemaName(),
+                benchmark.targetMaxFileSize()));
         int i = 1;
         for (NDV ndv : ndvList)
         {
@@ -49,5 +56,45 @@ public abstract class Statistics
             totalSize += ndv.totalContentSize();
         }
         System.out.println(format("============== Total Size: [%s] ==============\n", humanReadableByteCountSI(totalSize)));
+    }
+
+    public void printRegisterQuery(String bucket)
+    {
+        for (String tableName : benchmark.getTableNames()) {
+            String path = getTableLocation(bucket, benchmark.schemaName(), tableName);
+            System.out.println(format("CALL iceberg.system.register_table ('%s', '%s', '%s');", clean(benchmark.schemaName()), tableName, path));
+        }
+    }
+
+    public void printUnregisterQuery()
+    {
+        for (String tableName : benchmark.getTableNames()) {
+            System.out.println(format("CALL iceberg.system.unregister_table ('%s', '%s');", clean(benchmark.schemaName()), tableName));
+        }
+    }
+
+    public void printDropTableQuery()
+    {
+        for (String tableName : benchmark.getTableNames()) {
+            System.out.println(format("DROP TABLE IF EXISTS iceberg.%s.%s;", clean(benchmark.schemaName()), tableName));
+        }
+    }
+
+    public void printDropTableAndSchemaQuery()
+    {
+        for (String tableName : benchmark.getTableNames()) {
+            System.out.println(format("DROP TABLE IF EXISTS iceberg.%s.%s;", clean(benchmark.schemaName()), tableName));
+        }
+        System.out.println(format("DROP SCHEMA IF EXISTS iceberg.%s;", clean(benchmark.schemaName())));
+    }
+
+    public void printDropSchemaQuery()
+    {
+        System.out.println(format("DROP SCHEMA IF EXISTS iceberg.%s;", clean(benchmark.schemaName())));
+    }
+
+    private static String clean(String schemaName)
+    {
+        return schemaName.replace("-", "_");
     }
 }

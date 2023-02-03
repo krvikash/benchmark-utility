@@ -39,6 +39,7 @@ public class TpcdsBenchmark
     public List<String> getTableNames()
     {
         return Table.getBaseTables().stream()
+                .filter(table -> !table.getName().equals("dbgen_version"))
                 .map(table -> table.getName())
                 .toList();
     }

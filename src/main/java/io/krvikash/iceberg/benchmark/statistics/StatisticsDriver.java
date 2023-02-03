@@ -46,4 +46,32 @@ public class StatisticsDriver
         Statistics statistics = new TpcdsStatistics(s3Client, benchmark);
         statistics.printNDV(statistics.getNDV());
     }
+
+    public void printRegisterTableQuery(String schemaPrefix, Optional<FileSize> fileSize, int scaleFactor, Format format, Format.Case formatCase, boolean isPartitioned)
+    {
+        Benchmark benchmark = new TpchBenchmark(schemaPrefix, fileSize, scaleFactor, format, formatCase, isPartitioned);
+        Statistics statistics = new TpchStatistics(s3Client, benchmark);
+        statistics.printRegisterQuery(s3Client.getBucket());
+    }
+
+    public void printUnregisterTableQuery(String schemaPrefix, Optional<FileSize> fileSize, int scaleFactor, Format format, Format.Case formatCase, boolean isPartitioned)
+    {
+        Benchmark benchmark = new TpcdsBenchmark(schemaPrefix, fileSize, scaleFactor, format, formatCase, isPartitioned);
+        Statistics statistics = new TpcdsStatistics(s3Client, benchmark);
+        statistics.printUnregisterQuery();
+    }
+
+    public void printTpchDropTableAndSchemaQuery(String schemaPrefix, Optional<FileSize> fileSize, int scaleFactor, Format format, Format.Case formatCase, boolean isPartitioned)
+    {
+        Benchmark benchmark = new TpchBenchmark(schemaPrefix, fileSize, scaleFactor, format, formatCase, isPartitioned);
+        Statistics statistics = new TpchStatistics(s3Client, benchmark);
+        statistics.printDropTableAndSchemaQuery();
+    }
+
+    public void printTpcdsDropTableAndSchemaQuery(String schemaPrefix, Optional<FileSize> fileSize, int scaleFactor, Format format, Format.Case formatCase, boolean isPartitioned)
+    {
+        Benchmark benchmark = new TpcdsBenchmark(schemaPrefix, fileSize, scaleFactor, format, formatCase, isPartitioned);
+        Statistics statistics = new TpcdsStatistics(s3Client, benchmark);
+        statistics.printDropTableAndSchemaQuery();
+    }
 }

@@ -43,6 +43,11 @@ public class S3Client
         this.region = region;
     }
 
+    public String getBucket()
+    {
+        return bucket;
+    }
+
     public S3Client createS3Client()
     {
         if (profile != null) {
