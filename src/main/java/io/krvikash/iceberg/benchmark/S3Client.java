@@ -17,11 +17,20 @@ import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
+import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ListObjectsV2Request;
 import com.amazonaws.services.s3.model.ListObjectsV2Result;
+import com.amazonaws.services.s3.model.S3Object;
 import io.krvikash.iceberg.benchmark.statistics.NDV;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 import static io.krvikash.iceberg.benchmark.BenchmarkUtils.getDataPath;
 
@@ -79,6 +88,31 @@ public class S3Client
         while (listObjects.isTruncated());
 
         return new NDV(getDataPath(bucket, path), totalFileCount, totalSize.get());
+    }
+
+    public void download(String source, String target)
+    {
+        List<String> objectKeys = client.listObjects(bucket, source.replace("s3://" + bucket + "/", ""))
+                .getObjectSummaries()
+                .stream()
+                .map(s3ObjectSummary -> s3ObjectSummary.getKey())
+                .collect(Collectors.toList());
+        try {
+            for (String key : objectKeys) {
+                Path path = Paths.get(target);
+                Path fileName = Paths.get(key).getFileName();
+
+                if(!Files.exists(path)) {
+                    Files.createDirectories(path);
+                }
+                GetObjectRequest getObjectRequest = new GetObjectRequest(bucket, key);
+                S3Object s3Object = client.getObject(getObjectRequest);
+                Files.copy(s3Object.getObjectContent(), Path.of(path.toString(), fileName.toString()));
+            }
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
     }
 
     public static class Builder

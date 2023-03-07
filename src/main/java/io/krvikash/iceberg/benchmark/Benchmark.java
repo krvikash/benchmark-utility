@@ -59,7 +59,7 @@ public abstract class Benchmark
             return prefix;
         }
         // Use it, if you want file size to be included in prefix
-        return prefix + "-" + fileSize.get() + "-files";
-        //return prefix + "-" + "small" + "-files";
+        //return prefix + "-" + fileSize.get() + "-files";
+        return prefix + "-" + "small" + "-files";
     }
 }

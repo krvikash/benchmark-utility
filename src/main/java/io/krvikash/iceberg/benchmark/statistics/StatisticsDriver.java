@@ -74,4 +74,18 @@ public class StatisticsDriver
         Statistics statistics = new TpcdsStatistics(s3Client, benchmark);
         statistics.printDropTableAndSchemaQuery();
     }
+
+    public void downloadTpchTablesMetadata(String schemaPrefix, Optional<FileSize> fileSize, int scaleFactor, Format format, Format.Case formatCase, boolean isPartitioned)
+    {
+        Benchmark benchmark = new TpchBenchmark(schemaPrefix, fileSize, scaleFactor, format, formatCase, isPartitioned);
+        Statistics statistics = new TpchStatistics(s3Client, benchmark);
+        statistics.downloadMetadata();
+    }
+
+    public void downloadTpcdsTablesMetadata(String schemaPrefix, Optional<FileSize> fileSize, int scaleFactor, Format format, Format.Case formatCase, boolean isPartitioned)
+    {
+        Benchmark benchmark = new TpcdsBenchmark(schemaPrefix, fileSize, scaleFactor, format, formatCase, isPartitioned);
+        Statistics statistics = new TpcdsStatistics(s3Client, benchmark);
+        statistics.downloadMetadata();
+    }
 }

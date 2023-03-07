@@ -59,9 +59,21 @@ public class Main
 //        statisticsDriver.printTpchDropTable(schemaPrefix, fileSize, scaleFactor, ORC, formatCase, true);
 
         // TPC-DS files
-//        statisticsDriver.printTpcdsDropTable(schemaPrefix, fileSize, scaleFactor, PARQUET, formatCase, false);
-//        statisticsDriver.printTpcdsDropTable(schemaPrefix, fileSize, scaleFactor, PARQUET, formatCase, true);
-//        statisticsDriver.printTpcdsDropTable(schemaPrefix, fileSize, scaleFactor, ORC, formatCase, false);
-//        statisticsDriver.printTpcdsDropTable(schemaPrefix, fileSize, scaleFactor, ORC, formatCase, true);
+//        statisticsDriver.printTpcdsDropTableAndSchemaQuery(schemaPrefix, fileSize, scaleFactor, PARQUET, formatCase, false);
+//        statisticsDriver.printTpcdsDropTableAndSchemaQuery(schemaPrefix, fileSize, scaleFactor, PARQUET, formatCase, true);
+//        statisticsDriver.printTpcdsDropTableAndSchemaQuery(schemaPrefix, fileSize, scaleFactor, ORC, formatCase, false);
+//        statisticsDriver.printTpcdsDropTableAndSchemaQuery(schemaPrefix, fileSize, scaleFactor, ORC, formatCase, true);
+
+        // TPC-H files
+        statisticsDriver.downloadTpchTablesMetadata(schemaPrefix, fileSize, scaleFactor, PARQUET, formatCase, false);
+        statisticsDriver.downloadTpchTablesMetadata(schemaPrefix, fileSize, scaleFactor, PARQUET, formatCase, true);
+        statisticsDriver.downloadTpchTablesMetadata(schemaPrefix, fileSize, scaleFactor, ORC, formatCase, false);
+        statisticsDriver.downloadTpchTablesMetadata(schemaPrefix, fileSize, scaleFactor, ORC, formatCase, true);
+
+        // TPC-DS files
+        statisticsDriver.downloadTpcdsTablesMetadata(schemaPrefix, fileSize, scaleFactor, PARQUET, formatCase, false);
+        statisticsDriver.downloadTpcdsTablesMetadata(schemaPrefix, fileSize, scaleFactor, PARQUET, formatCase, true);
+        statisticsDriver.downloadTpcdsTablesMetadata(schemaPrefix, fileSize, scaleFactor, ORC, formatCase, false);
+        statisticsDriver.downloadTpcdsTablesMetadata(schemaPrefix, fileSize, scaleFactor, ORC, formatCase, true);
     }
 }

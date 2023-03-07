@@ -88,6 +88,17 @@ public abstract class Statistics
         System.out.println(format("DROP SCHEMA IF EXISTS iceberg.%s;", clean(benchmark.schemaName())));
     }
 
+    public void downloadMetadata()
+    {
+        String bucket = s3Client.getBucket();
+        for (String tableName : benchmark.getTableNames()) {
+            String source = getTableLocation(bucket, benchmark.schemaName(), tableName) + "/metadata";
+            String target = "download/" + source.replace("s3://" + bucket, "");
+            s3Client.download(source, target);
+            System.out.println("Downloaded " + source + " at " + target);
+        }
+    }
+
     public void printDropSchemaQuery()
     {
         System.out.println(format("DROP SCHEMA IF EXISTS iceberg.%s;", clean(benchmark.schemaName())));
